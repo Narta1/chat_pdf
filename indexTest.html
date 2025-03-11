@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDF Chat</title>
+    <link rel="stylesheet" href="indexTest.css">
+</head>
+<body>
+    <div class="container">
+        <h2 id="title">Chat with Your PDF</h2>
+
+        <form id="uploadForm" enctype="multipart/form-data">
+            
+            <label for="file-upload" class="custom-file-upload">📄 Upload PDF</label>
+            <label id="name">Nothing selected</label>
+            <input id="file-upload" type="file" />
+
+            <br>
+            <br>
+            <label for="query">Enter your question:</label>
+            <input type="text" id="query" name="query" placeholder="Ask something about the PDF..." required>
+
+           
+            <button type="submit" class="btn">Submit</button>
+        </form>
+    </div>
+
+    <!-- Chat-Like Response Section -->
+    <div class="rep">
+        <h2>Response:</h2>
+        <div id="response">No response yet...</div>
+    </div>
+
+    <script>
+        document.getElementById("file-upload").addEventListener("change", function(event) {
+        let file = event.target.files[0]; // Get the selected file
+        let nameLabel = document.getElementById("name");
+
+        if (file) {
+            nameLabel.innerText = `📄 ${file.name}`;  // Display file name
+            nameLabel.style.color = "#10a37f";  // Change text color (optional)
+        } else {
+            nameLabel.innerText = "Nothing selected"; // Reset if no file chosen
+            nameLabel.style.color = "white"; 
+        }
+    });
+        document.getElementById("uploadForm").addEventListener("submit", async function(event) {
+            event.preventDefault();
+            let file = document.getElementById("file-upload").files[0];
+        if (!file) {
+            alert("Please select a PDF before submitting!"); 
+            return;
+        }
+
+            let formData = new FormData();
+            formData.append("pdf", file);
+            formData.append("query", document.getElementById("query").value);
+
+            try {
+                let response = await fetch('http://127.0.0.1:5000/upload-pdf', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await response.json();
+                document.getElementById('response').innerText = data.response || `Error: ${data.error}`;
+            } catch (error) {
+                document.getElementById('response').innerText = `Error: ${error.message}`;
+            }
+        });
+
+
+        document.addEventListener("keydown",(event)=>{
+        if(event.key==="ArrowLeft"){
+            window.location.href = "/navigation/portfolio.html"; 
+        }
+    })
+    </script>
+</body>
+</html>
